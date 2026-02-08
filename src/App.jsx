@@ -8,6 +8,8 @@ const storageKeys = {
   NO_PROJECT_VIEW: 'noProject',
   NEW_PROJECT_VIEW: 'newProject',
   PROJECT_VIEW: 'projectView',
+  PROJECTS: 'projects',
+  ACTIVE_PROJECT: 'activeProject',
 }
 
 const activeView = {
@@ -18,8 +20,8 @@ const activeView = {
 
 function App() {
   const [view, setView] = useState(storageKeys.NO_PROJECT_VIEW);
-  const [projects, setProjects] = useState(getFromLStorage('projects') ?? []);
-  const [activeProject, setActiveProject] = useState(getFromLStorage('activeProject'));
+  const [projects, setProjects] = useState(getFromLStorage(storageKeys.PROJECTS) ?? []);
+  const [activeProject, setActiveProject] = useState(getFromLStorage(storageKeys.ACTIVE_PROJECT));
 
   const ActiveComponent = activeView[view];
 
@@ -29,11 +31,11 @@ function App() {
 
   // function clearActiveProject() {
   //   setActiveProject(() => null);
-  //   removeFromLStorage('activeProject');
+  //   removeFromLStorage(storageKeys.ACTIVE_PROJECT);
   // }
 
   function handleProjectSelect(project) {
-    setToLStorage('activeProject', project)
+    setToLStorage(storageKeys.ACTIVE_PROJECT, project)
     setActiveProject(project);
     setView(storageKeys.PROJECT_VIEW);
   }
@@ -65,6 +67,7 @@ function App() {
         setToLStorage('projects', newProjects);
         return newProjects;
       });
+
       setView(storageKeys.NO_PROJECT_VIEW);
     }
   }
@@ -76,7 +79,7 @@ function App() {
         onProjectAdd={handleProjectAdd}
         // onProjectSelect={handleProjectSelect}
         />
-      
+
       <div className="w-[70%]">
         <ActiveComponent onProjectAdd={handleProjectAdd}
           onCancel={() => setView(storageKeys.NO_PROJECT_VIEW)}

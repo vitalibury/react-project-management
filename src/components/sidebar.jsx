@@ -1,5 +1,4 @@
 export default function Sidebar({projects, activeProject, onProjectAdd, onProjectSelect}) {
-    // debugger;
     return (
         <aside className="w-[30%] flex flex-col justify-end">
             <div className="h-[95%] pt-24 px-10 flex flex-col gap-8 items-start bg-[#3b2f2f] bg-stone-800 rounded-tr-xl">
