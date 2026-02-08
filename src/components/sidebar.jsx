@@ -16,7 +16,7 @@ export default function Sidebar({projects, activeProject, onProjectAdd, onProjec
                     {projects.map(p => {
                         const classSet = `h-11 px-3 flex items-center rounded list-none ${p.id === activeProject?.id ? 'text-stone-100 bg-stone-600' : 'text-stone-400 hover:bg-stone-700'}`
                         return <li key={p.id} className={classSet} onClick={() => onProjectSelect(p)}>
-                            <span className="overflow-x-hidden whitespace-nowrap text-ellipsis">{p.title}</span>
+                            <span className="capitalize overflow-x-hidden whitespace-nowrap text-ellipsis">{p.title}</span>
                         </li>
                     })}
                 </ul>
