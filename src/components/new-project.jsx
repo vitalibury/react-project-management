@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function NewProject({onCancel, onProjectSave}) {
+export default function NewProject({onNewProjectCancel, onProjectSave}) {
     const formFields = ['title', 'description', 'date'];
     const [formData, setFormData] = useState(
         formFields.reduce((acc, f) => Object.assign(acc, {[f]: ''}), {})
@@ -18,7 +18,7 @@ export default function NewProject({onCancel, onProjectSave}) {
             <form action="submit" onSubmit={() => onProjectSave(formData)} className="flex flex-col gap-5">
             <div className="flex justify-end">
                 <button className="h-11 w-24 rounded-lg  text-stone-800"
-                    onClick={onCancel}>
+                    onClick={onNewProjectCancel}>
                     Cancel
                 </button>
                 <button className="h-11 w-24 rounded-lg  bg-stone-800 text-stone-300"

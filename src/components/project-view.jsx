@@ -1,7 +1,7 @@
 import Task from "./Task";
 import TaskForm from "./Task-form";
 
-export default function ProjectView({project, onTaskAdd, onTaskDelete, onDelete, onCancel}) {
+export default function ProjectView({project, onTaskAdd, onTaskDelete, onProjectDelete, onSave}) {
     const {title, date, description, tasks} = project;
 
     return (
@@ -9,10 +9,10 @@ export default function ProjectView({project, onTaskAdd, onTaskDelete, onDelete,
             <header className="flex justify-between">
                 <div className="text-3xl capitalize font-semibold">{title}</div>
                 <div className="flex gap-5">
-                    <button onClick={onCancel}>
-                        Cancel
+                    <button onClick={onSave}>
+                        Save
                     </button>
-                    <button onClick={onDelete}>
+                    <button onClick={onProjectDelete}>
                         Delete
                     </button>
                 </div>

@@ -13,7 +13,7 @@ export function getFromLStorage(key) {
 }
 
 export function removeFromLStorage(key) {
-    localStorage.clear(key);
+    localStorage.removeItem(key);
 }
 
 export function formatDate(date) {

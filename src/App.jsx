@@ -33,8 +33,7 @@ function App() {
   }
 
   function handleProjectSelect(project) {
-    setToLStorage(storageKeys.ACTIVE_PROJECT, project)
-    setActiveProject(project);
+    recordActiveProject(project);
     updateView(storageKeys.PROJECT_VIEW);
   }
 
@@ -47,11 +46,6 @@ function App() {
       ? storageKeys.PROJECT_VIEW
       : storageKeys.NO_PROJECT_VIEW
     );
-  }
-
-  function updateView(view) {
-    setToLStorage(storageKeys.ACTIVE_VIEW, view);
-    setView(view);
   }
 
   function handleNewProjectSave(newProjectData) {
@@ -78,8 +72,7 @@ function App() {
         return newProjects;
       });
 
-      clearActiveProject();
-      updateView(storageKeys.NO_PROJECT_VIEW);
+      handleSave();
     }
   }
 
@@ -98,6 +91,12 @@ function App() {
     updateActiveProject(newActiveProject);
   }
 
+  function handleProjectDelete() {
+    const newProjects = projects.filter(p => p.id !== activeProject.id);
+    setNewProjects(newProjects);
+    handleSave();
+  }
+
   function handleTaskDelete(id) {
     const newActiveProject = {
       ...activeProject,
@@ -112,10 +111,28 @@ function App() {
       : p
     );
 
-    setToLStorage(storageKeys.PROJECTS, newProjects);
-    setProjects(newProjects);
+    setNewProjects(newProjects);
+    recordActiveProject(newProject);
+  }
+
+  function recordActiveProject(newProject) {
     setToLStorage(storageKeys.ACTIVE_PROJECT, newProject);
     setActiveProject(newProject);
+  }
+
+  function updateView(view) {
+    setToLStorage(storageKeys.ACTIVE_VIEW, view);
+    setView(view);
+  }
+
+  function handleSave() {
+    updateView(storageKeys.NO_PROJECT_VIEW);
+    clearActiveProject();
+  }
+
+  function setNewProjects(projects) {
+    setToLStorage(storageKeys.PROJECTS, projects);
+    setProjects(projects);
   }
 
   return (
@@ -128,10 +145,12 @@ function App() {
 
       <div className="w-[70%]">
         <ActiveComponent onProjectAdd={handleProjectAdd}
+          onProjectDelete={handleProjectDelete}
+          onSave={handleSave}
           onTaskAdd={handleTaskAdd}
           onTaskDelete={handleTaskDelete}
           project={activeProject}
-          onCancel={handleNewProjectCancel}
+          onNewProjectCancel={handleNewProjectCancel}
           onProjectSave={handleNewProjectSave} />
       </div>
     </div>
