@@ -1,13 +1,15 @@
 import { useState } from "react";
-import Sidebar from "./components/sidebar";
 import { formatDate, getFromLStorage, removeFromLStorage, setToLStorage } from "./utility";
-import NoProjectView from "./components/no-project-view";
 import NewProject from "./components/new-project";
+import ProjectView from "./components/project-view";
+import Sidebar from "./components/sidebar";
+import NoProjectView from "./components/no-project-view";
 
 const storageKeys = {
   NO_PROJECT_VIEW: 'noProject',
   NEW_PROJECT_VIEW: 'newProject',
   PROJECT_VIEW: 'projectView',
+  ACTIVE_VIEW: 'activeView',
   PROJECTS: 'projects',
   ACTIVE_PROJECT: 'activeProject',
 }
@@ -15,33 +17,41 @@ const storageKeys = {
 const activeView = {
   [storageKeys.NO_PROJECT_VIEW]: NoProjectView,
   [storageKeys.NEW_PROJECT_VIEW]: NewProject,
-  // [storageKeys.PROJECT_VIEW]: 2
+  [storageKeys.PROJECT_VIEW]: ProjectView
 }
 
 function App() {
-  const [view, setView] = useState(storageKeys.NO_PROJECT_VIEW);
+  const [view, setView] = useState(getFromLStorage(storageKeys.ACTIVE_VIEW) ?? storageKeys.NO_PROJECT_VIEW);
   const [projects, setProjects] = useState(getFromLStorage(storageKeys.PROJECTS) ?? []);
   const [activeProject, setActiveProject] = useState(getFromLStorage(storageKeys.ACTIVE_PROJECT));
 
   const ActiveComponent = activeView[view];
 
-  // function updateProjects(projects) {
-  //   setToLStorage('projects', projects);
-  // }
-
-  // function clearActiveProject() {
-  //   setActiveProject(() => null);
-  //   removeFromLStorage(storageKeys.ACTIVE_PROJECT);
-  // }
+  function clearActiveProject() {
+    setActiveProject(null);
+    removeFromLStorage(storageKeys.ACTIVE_PROJECT);
+  }
 
   function handleProjectSelect(project) {
     setToLStorage(storageKeys.ACTIVE_PROJECT, project)
     setActiveProject(project);
-    setView(storageKeys.PROJECT_VIEW);
+    updateView(storageKeys.PROJECT_VIEW);
   }
 
   function handleProjectAdd() {
-    setView(storageKeys.NEW_PROJECT_VIEW);
+    updateView(storageKeys.NEW_PROJECT_VIEW);
+  }
+
+  function handleNewProjectCancel() {
+    updateView(activeProject
+      ? storageKeys.PROJECT_VIEW
+      : storageKeys.NO_PROJECT_VIEW
+    );
+  }
+
+  function updateView(view) {
+    setToLStorage(storageKeys.ACTIVE_VIEW, view);
+    setView(view);
   }
 
   function handleNewProjectSave(newProjectData) {
@@ -64,12 +74,48 @@ function App() {
           date: formatDate(new Date(newProjectData.date)),
           tasks: []
         }];
-        setToLStorage('projects', newProjects);
+        setToLStorage(storageKeys.PROJECTS, newProjects);
         return newProjects;
       });
 
-      setView(storageKeys.NO_PROJECT_VIEW);
+      clearActiveProject();
+      updateView(storageKeys.NO_PROJECT_VIEW);
     }
+  }
+
+  function handleTaskAdd(text) {
+    const newTask = {
+        id: 0,
+        text
+    };
+    activeProject.tasks.forEach(t => newTask.id = t.id > newTask.id
+        ? t.id
+        : newTask.id
+    )
+    newTask.id++;
+
+    const newActiveProject = {...activeProject, tasks: [...activeProject.tasks, newTask]};
+    updateActiveProject(newActiveProject);
+  }
+
+  function handleTaskDelete(id) {
+    const newActiveProject = {
+      ...activeProject,
+      tasks: activeProject.tasks.filter(t => t.id !== id)
+    };
+    updateActiveProject(newActiveProject);
+  }
+
+  function updateActiveProject(newProject) {
+    const newProjects = projects.map(p => p.id === newProject.id
+      ? newProject
+      : p
+    );
+
+    setToLStorage(storageKeys.PROJECTS, newProjects);
+    setProjects(newProjects);
+    setToLStorage(storageKeys.ACTIVE_PROJECT, newProject);
+    setActiveProject(newProject);
   }
 
   return (
@@ -77,12 +123,15 @@ function App() {
       <Sidebar projects={projects}
         activeProject={activeProject}
         onProjectAdd={handleProjectAdd}
-        // onProjectSelect={handleProjectSelect}
+        onProjectSelect={handleProjectSelect}
         />
 
       <div className="w-[70%]">
         <ActiveComponent onProjectAdd={handleProjectAdd}
-          onCancel={() => setView(storageKeys.NO_PROJECT_VIEW)}
+          onTaskAdd={handleTaskAdd}
+          onTaskDelete={handleTaskDelete}
+          project={activeProject}
+          onCancel={handleNewProjectCancel}
           onProjectSave={handleNewProjectSave} />
       </div>
     </div>
